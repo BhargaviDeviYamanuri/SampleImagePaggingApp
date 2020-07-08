@@ -1,6 +1,8 @@
 package com.samplepaggingapp.view
 
 import android.os.Bundle
+import android.util.Log
+import android.view.View
 import android.view.inputmethod.EditorInfo
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -8,9 +10,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.samplepaggingapp.R
 import com.samplepaggingapp.adapter.PhotoAdapter
-import com.samplepaggingapp.utils.App
-import com.samplepaggingapp.utils.hideSoftKeyboard
-import com.samplepaggingapp.utils.value
+import com.samplepaggingapp.utils.*
 import com.samplepaggingapp.viewmodel.PhotoViewModel
 import com.samplepaggingapp.viewmodel.ViewModelFactory
 import kotlinx.android.synthetic.main.content_main.*
@@ -37,18 +37,29 @@ class PhotoActivity : AppCompatActivity() {
         val photoAdapter = PhotoAdapter(this)
         etSearchKey.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                val searchKey = etSearchKey.value
-                photoViewModel.getSearchPhotos(searchKey).observe(this, Observer {
-                    photoAdapter.submitList(it)
-                })
                 hideSoftKeyboard(this)
+                if (isNetworkAvailable(this)) {
+                    val searchKey = etSearchKey.value
+                    LoadingDialog.getInstance().show(this)
+                    photoViewModel.getSearchPhotos(searchKey).observe(this, Observer {
+                        Log.i("Result", "onCreate: $it")
+                        rvSearchResult.visibility = View.VISIBLE
+                        tvNoSearchResult.visibility = View.GONE
+                        photoAdapter.submitList(it)
+                        if (LoadingDialog.getInstance() != null) {
+                            LoadingDialog.getInstance().hide()
+                        }
+                    })
+                } else {
+                    rvSearchResult.visibility = View.GONE
+                    tvNoSearchResult.visibility = View.VISIBLE
+                    tvNoSearchResult.text = getString(R.string.no_internet)
+                }
+
                 return@setOnEditorActionListener true
             }
             return@setOnEditorActionListener false
         }
-
-
-
         rvSearchResult.adapter = photoAdapter
     }
 }
