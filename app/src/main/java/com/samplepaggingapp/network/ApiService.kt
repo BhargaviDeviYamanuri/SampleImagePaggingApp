@@ -1,7 +1,8 @@
 package com.samplepaggingapp.network
 
-import com.samplepaggingapp.model.Photos
+import com.samplepaggingapp.model.PhotosResponse
 import com.samplepaggingapp.utils.Constants
+import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query
 
@@ -15,5 +16,5 @@ interface ApiService {
         @Query(Constants.PER_PAGE) perPage: Int,
         @Query(Constants.PAGE) page: Int,
         @Query(Constants.SEARCH_TEXT) searchText: String
-    ): Photos
+    ): Call<PhotosResponse>
 }

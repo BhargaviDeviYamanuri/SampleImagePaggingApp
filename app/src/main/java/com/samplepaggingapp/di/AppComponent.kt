@@ -5,7 +5,7 @@ import com.samplepaggingapp.view.PhotoActivity
 import dagger.BindsInstance
 import dagger.Component
 
-@Component(modules = [AppModule::class])
+@Component(modules = [AppModule::class, ViewModelModule::class])
 interface AppComponent {
     @Component.Factory
     interface Factory {

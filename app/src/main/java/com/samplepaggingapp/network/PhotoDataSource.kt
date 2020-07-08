@@ -1,8 +1,13 @@
 package com.samplepaggingapp.network
 
+import android.util.Log
 import androidx.paging.PageKeyedDataSource
 import com.samplepaggingapp.model.Photo
+import com.samplepaggingapp.model.PhotosResponse
 import com.samplepaggingapp.utils.Constants
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import javax.inject.Inject
 
 class PhotoDataSource @Inject constructor(val apiService: ApiService, val searchKey: String) :
@@ -11,7 +16,7 @@ class PhotoDataSource @Inject constructor(val apiService: ApiService, val search
         params: LoadInitialParams<Int>,
         callback: LoadInitialCallback<Int, Photo>
     ) {
-        val initialResult = apiService.getSearchResult(
+        apiService.getSearchResult(
             Constants.METHOD_VALUE,
             Constants.API_KEY_VALUE,
             Constants.FORMAT_VALUE,
@@ -19,12 +24,31 @@ class PhotoDataSource @Inject constructor(val apiService: ApiService, val search
             Constants.PAGE_SIZE,
             Constants.FIRST_PAGE,
             searchKey
-        )
-        callback.onResult(initialResult.photo, Constants.FIRST_PAGE, Constants.FIRST_PAGE + 1)
+        ).enqueue(object : Callback<PhotosResponse> {
+            override fun onFailure(call: Call<PhotosResponse>, t: Throwable) {
+                t.printStackTrace()
+            }
+
+            override fun onResponse(
+                call: Call<PhotosResponse>,
+                response: Response<PhotosResponse>
+            ) {
+                if (response.isSuccessful && !response.body()!!.photos.photo.isNullOrEmpty()) {
+                    Log.i("LoadInitial", "onResponse: ${response.body()!!.photos.photo}")
+                    callback.onResult(
+                        response.body()!!.photos.photo,
+                        Constants.FIRST_PAGE,
+                        Constants.FIRST_PAGE + 1
+                    )
+                }
+            }
+
+        })
+
     }
 
     override fun loadAfter(params: LoadParams<Int>, callback: LoadCallback<Int, Photo>) {
-        val afterResult = apiService.getSearchResult(
+        apiService.getSearchResult(
             Constants.METHOD_VALUE,
             Constants.API_KEY_VALUE,
             Constants.FORMAT_VALUE,
@@ -32,15 +56,29 @@ class PhotoDataSource @Inject constructor(val apiService: ApiService, val search
             Constants.PAGE_SIZE,
             Constants.FIRST_PAGE,
             searchKey
-        )
-        val totalCount: Int = afterResult.total.toInt()
-        val key: Int? = if (params.key != totalCount) params.key + 1 else null
-        callback.onResult(afterResult.photo, key)
+        ).enqueue(object : Callback<PhotosResponse> {
+            override fun onFailure(call: Call<PhotosResponse>, t: Throwable) {
+                t.printStackTrace()
+            }
+
+            override fun onResponse(
+                call: Call<PhotosResponse>,
+                response: Response<PhotosResponse>
+            ) {
+                if (response.isSuccessful && !response.body()!!.photos.photo.isNullOrEmpty()) {
+                    Log.i("LoadAfter", "onResponse: ${response.body()!!.photos.photo}")
+                    val totalCount: Int = response.body()!!.photos.total.toInt()
+                    val key: Int? = if (params.key != totalCount) params.key + 1 else null
+                    callback.onResult(response.body()!!.photos.photo, key)
+                }
+            }
+
+        })
+
     }
 
     override fun loadBefore(params: LoadParams<Int>, callback: LoadCallback<Int, Photo>) {
-        val key: Int? = if (params.key > 1) params.key - 1 else null
-        val beforeResult = apiService.getSearchResult(
+        apiService.getSearchResult(
             Constants.METHOD_VALUE,
             Constants.API_KEY_VALUE,
             Constants.FORMAT_VALUE,
@@ -48,7 +86,22 @@ class PhotoDataSource @Inject constructor(val apiService: ApiService, val search
             Constants.PAGE_SIZE,
             Constants.FIRST_PAGE,
             searchKey
-        )
-        callback.onResult(beforeResult.photo, key)
+        ).enqueue(object : Callback<PhotosResponse> {
+            override fun onFailure(call: Call<PhotosResponse>, t: Throwable) {
+                t.printStackTrace()
+            }
+
+            override fun onResponse(
+                call: Call<PhotosResponse>,
+                response: Response<PhotosResponse>
+            ) {
+                if (response.isSuccessful && !response.body()!!.photos.photo.isNullOrEmpty()) {
+                    Log.i("LoadBefore", "onResponse: ${response.body()!!.photos.photo}")
+                    val key: Int? = if (params.key > 1) params.key - 1 else null
+                    callback.onResult(response.body()!!.photos.photo, key)
+                }
+            }
+
+        })
     }
 }
