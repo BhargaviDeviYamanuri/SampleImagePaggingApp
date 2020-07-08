@@ -1,5 +1,7 @@
 package com.samplepaggingapp.model
 
+data class PhotosResponse(val photos: Photos, val stat: String)
+
 data class Photos(
     val page: Int,
     val pages: Int,

@@ -11,12 +11,12 @@ import retrofit2.converter.gson.GsonConverterFactory
 @Module
 class AppModule {
     @Provides
-    private fun provideOkHttpClient(): OkHttpClient {
+    fun provideOkHttpClient(): OkHttpClient {
         return OkHttpClient.Builder().retryOnConnectionFailure(false).build()
     }
 
     @Provides
-    private fun provideRetrofit(
+    fun provideRetrofit(
         okhttpClient: OkHttpClient
     ): ApiService {
         return Retrofit.Builder()
