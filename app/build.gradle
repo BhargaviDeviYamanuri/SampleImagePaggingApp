@@ -65,7 +65,17 @@ dependencies {
     implementation "androidx.paging:paging-runtime:$paging_version"
     testImplementation "androidx.paging:paging-common:$paging_version"
 
+    //Mockito
+    testImplementation "org.mockito:mockito-core:$mockito_version"
+    testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$mockito_version"
+    testImplementation "org.mockito:mockito-inline:$mockito_inline_version"
+    testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$mockito_version"
     testImplementation 'junit:junit:4.12'
+    androidTestImplementation "androidx.arch.core:core-testing:2.1.0"
+    testImplementation "androidx.arch.core:core-testing:2.1.0"
+    testImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test:rules:1.2.0'
+    androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 

@@ -9,6 +9,8 @@ buildscript {
     ext.retrofit_version = '2.8.1'
     ext.gson_version = '2.8.6'
     ext.paging_version = "2.1.2"
+    ext.mockito_version = "2.2.0"
+    ext.mockito_inline_version = "2.24.5"
 
     repositories {
         google()
